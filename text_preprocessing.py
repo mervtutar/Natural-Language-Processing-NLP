@@ -35,47 +35,49 @@ pd.set_option('display.float_format', lambda x: '%.2f' % x)
 ##################################################
 # Text Preprocessing
 ##################################################
-df = pd.read_csv("amazon_reviews.csv", sep=",")
-df.head()
-df.columns
+def preprocess_reviews(file_path="amazon_reviews.csv"):
+    df = pd.read_csv(file_path, sep=",")
+    df.head()
+    df.columns
 
-# Normalizing Case Folding
-print(df["reviewText"]) # bu değişkene odaklanacağız
-
-
-# ilk atılması gereken adımlardan biri tüm harfleri belirli bir standarda koymak (normalize etmek) çünkü bazıları büyük bazıları küçük
-df["reviewText"] = df["reviewText"].str.lower() # hepsini küçük harf yapalım
-
-# Noktalama İşaretleri ( Punctuations )
-df["reviewText"] = df["reviewText"].str.replace('[^\w\s]', '', regex=True) # noktalama işaretlerinin yerine boşluk getir
-
-# Numbers
-df["reviewText"] = df["reviewText"].str.replace('\d', '', regex=True)
-
-# Stopwords -> dilde anlam taşımayan kelimeler
-import nltk
-# nltk.download('stopwords')
-sw = stopwords.words('english')
-
-# metinlerde her satırı gezip stopwords varsa onları silmeliyiz ya da stopwords dışındakileri seçmeliyiz
-# öncelikle cümleleri boşluklara göre split edip list comp yapısıyla kelimelerin hepsini gezip stopwords olmayanları seçelim, seçtiklerimizi tekrar join ile birleştirelim
-df["reviewText"] = df["reviewText"].apply(lambda x: " ".join(x for x in str(x).split() if x not in sw))
+    # Normalizing Case Folding
+    print(df["reviewText"]) # bu değişkene odaklanacağız
 
 
-# Rarewords -> nadir geçen kelimeler
-# nadir geçen kelimeleri çıkarmak için kelimelerin frekansını hesaplayıp kaç kere geçtiğini hesaplamalıyız
-temp_df = pd.Series(' '.join(df['reviewText']).split()).value_counts()
+    # ilk atılması gereken adımlardan biri tüm harfleri belirli bir standarda koymak (normalize etmek) çünkü bazıları büyük bazıları küçük
+    df["reviewText"] = df["reviewText"].str.lower() # hepsini küçük harf yapalım
 
-# frekansı 1 ya da 1 den küçük olanları drop edelim
-drops = temp_df[temp_df <= 1]
-df["reviewText"] = df["reviewText"].apply(lambda x: " ".join(x for x in str(x).split() if x not in drops))
+    # Noktalama İşaretleri ( Punctuations )
+    df["reviewText"] = df["reviewText"].str.replace('[^\w\s]', '', regex=True) # noktalama işaretlerinin yerine boşluk getir
 
-# Tokenization -> metni parçalarına ayırmak, programatik şekilde
-# nltk.download('punkt_tab')
-df["reviewText"].apply(lambda x: TextBlob(x).words).head() # tüm satırlarda apply ile gez TextBlob(x) metodu çalıştırıldıktan sonra kelimeler getirilsin
+    # Numbers
+    df["reviewText"] = df["reviewText"].str.replace('\d', '', regex=True)
 
-# Lemmatization -> kelimeleri köklerine ayırmak, stemming metodu da aynı amaçla kullanılır
-#nltk.download('wordnet')
-df['reviewText'] = df['reviewText'].apply(lambda x: " ".join([Word(word).lemmatize() for word in x.split()]))
-# capabilities->capability oldu
+    # Stopwords -> dilde anlam taşımayan kelimeler
+    import nltk
+    # nltk.download('stopwords')
+    sw = stopwords.words('english')
+
+    # metinlerde her satırı gezip stopwords varsa onları silmeliyiz ya da stopwords dışındakileri seçmeliyiz
+    # öncelikle cümleleri boşluklara göre split edip list comp yapısıyla kelimelerin hepsini gezip stopwords olmayanları seçelim, seçtiklerimizi tekrar join ile birleştirelim
+    df["reviewText"] = df["reviewText"].apply(lambda x: " ".join(x for x in str(x).split() if x not in sw))
+
+
+    # Rarewords -> nadir geçen kelimeler
+    # nadir geçen kelimeleri çıkarmak için kelimelerin frekansını hesaplayıp kaç kere geçtiğini hesaplamalıyız
+    temp_df = pd.Series(' '.join(df['reviewText']).split()).value_counts()
+
+    # frekansı 1 ya da 1 den küçük olanları drop edelim
+    drops = temp_df[temp_df <= 1]
+    df["reviewText"] = df["reviewText"].apply(lambda x: " ".join(x for x in str(x).split() if x not in drops))
+
+    # Tokenization -> metni parçalarına ayırmak, programatik şekilde
+    # nltk.download('punkt_tab')
+    df["reviewText"].apply(lambda x: TextBlob(x).words).head() # tüm satırlarda apply ile gez TextBlob(x) metodu çalıştırıldıktan sonra kelimeler getirilsin
+
+    # Lemmatization -> kelimeleri köklerine ayırmak, stemming metodu da aynı amaçla kullanılır
+    #nltk.download('wordnet')
+    df['reviewText'] = df['reviewText'].apply(lambda x: " ".join([Word(word).lemmatize() for word in x.split()]))
+    # capabilities->capability oldu
+    return df['reviewText']
 
