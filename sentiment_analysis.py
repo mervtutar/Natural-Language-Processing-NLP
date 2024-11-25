@@ -134,7 +134,7 @@ X_count.toarray()[10:15]
 # 2 Terimlerin Dokümanlarda Geçme Frekanslarını Hücrelere Yerleştir
 
 
-# TF-IDF
+# TF-IDF bir kelimenin metindeki öenmini hesaplar
 # 1 Count Vectorizer'ı Hesapla (Kelimelerin her bir dokümandaki frekansı)
 # 2 TF-Term Frequency'yi Hesapla (t teriminin ilgili dokümandaki frekansı / dokümandaki toplam terim sayısı)
 # 3 IDF - Inverse Document Frequency'i Hesapla 1+ loge ((toplam döküman sayısı+1) / (içinde t terimi olan döküman sayısı+1))
